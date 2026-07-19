@@ -7,65 +7,119 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <header>
+  <!-- Reusable icon set (stroke, currentColor) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/>
+      <circle cx="12" cy="12" r="2.4"/>
+    </symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="4" width="18" height="14" rx="2"/>
+      <path d="M3 15l4.5-4.5a2 2 0 0 1 2.8 0L15 15"/>
+      <path d="M13 13l1.8-1.8a2 2 0 0 1 2.8 0L21 14"/>
+      <circle cx="8" cy="9" r="1.3"/>
+    </symbol>
+    <symbol id="i-import" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3v10m0 0l-3.5-3.5M12 13l3.5-3.5"/>
+      <path d="M4 15v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/>
+    </symbol>
+    <symbol id="i-yolo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3.5" y="6.5" width="11" height="11" rx="1"/>
+      <path d="M14 10l6-6m0 0h-4m4 0v4"/>
+    </symbol>
+    <symbol id="i-coco" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 4C6.5 4 7 8 4.5 8v0C7 8 6.5 12 9 12"/>
+      <path d="M9 12C6.5 12 7 16 4.5 16v0C7 16 6.5 20 9 20"/>
+      <path d="M15 4c2.5 0 2 4 4.5 4v0C17 8 17.5 12 15 12"/>
+      <path d="M15 12c2.5 0 2 4 4.5 4v0C17 16 17.5 20 15 20"/>
+    </symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-prev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></symbol>
+    <symbol id="i-next" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m2 0v12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 10V7a1 1 0 0 1 1-1h3M14 6h3a1 1 0 0 1 1 1v3M18 14v3a1 1 0 0 1-1 1h-3M10 18H7a1 1 0 0 1-1-1v-3"/>
+      <circle cx="12" cy="12" r="3"/><path d="M12 6.5v-2M12 19.5v-2M6.5 12h-2M19.5 12h-2"/>
+    </symbol>
+  </svg>
+
+  <header class="topbar">
     <div class="brand">
-      <h1>🛰️ MineLabeler</h1>
-      <span class="tag">open training-data labeling for humanitarian demining</span>
+      <span class="brand-mark"><svg class="ic"><use href="#i-logo"></use></svg></span>
+      <div class="brand-text">
+        <strong>MineLabeler</strong>
+        <span>humanitarian demining · data labeling</span>
+      </div>
     </div>
-    <div class="header-actions">
-      <label class="btn file-btn">
-        Load images
-        <input type="file" id="fileInput" accept="image/*" multiple hidden>
-      </label>
-      <label class="btn ghost file-btn">
-        Import COCO
-        <input type="file" id="importInput" accept="application/json,.json" hidden>
-      </label>
-      <button class="btn ghost" id="exportYolo">Export YOLO</button>
-      <button class="btn ghost" id="exportCoco">Export COCO</button>
+
+    <div class="toolbar">
+      <div class="tool-group">
+        <label class="tool file-btn">
+          <svg class="ic"><use href="#i-upload"></use></svg><span>Load images</span>
+          <input type="file" id="fileInput" accept="image/*" multiple hidden>
+        </label>
+        <label class="tool file-btn">
+          <svg class="ic"><use href="#i-import"></use></svg><span>Import COCO</span>
+          <input type="file" id="importInput" accept="application/json,.json" hidden>
+        </label>
+      </div>
+      <span class="tool-divider"></span>
+      <div class="tool-group">
+        <button class="tool" id="exportYolo"><svg class="ic"><use href="#i-yolo"></use></svg><span>Export YOLO</span></button>
+        <button class="tool" id="exportCoco"><svg class="ic"><use href="#i-coco"></use></svg><span>Export COCO</span></button>
+      </div>
     </div>
   </header>
 
   <main>
     <aside class="sidebar left">
-      <h2>Classes <span class="hint">(hotkeys 1–9)</span></h2>
-      <ul id="classList"></ul>
-      <div class="add-class">
-        <input type="text" id="newClassName" placeholder="Add class…" maxlength="32">
-        <button class="btn small" id="addClassBtn">+</button>
+      <div class="panel">
+        <div class="panel-head">
+          <span>Classes</span>
+          <span class="kbd-hint">1–9</span>
+        </div>
+        <ul id="classList"></ul>
+        <div class="add-class">
+          <input type="text" id="newClassName" placeholder="Add class…" maxlength="32">
+          <button class="icon-btn accent" id="addClassBtn" title="Add class"><svg class="ic"><use href="#i-plus"></use></svg></button>
+        </div>
       </div>
 
-      <h2>Boxes on this image</h2>
-      <ul id="boxList" class="box-list"></ul>
+      <div class="panel grow">
+        <div class="panel-head"><span>Boxes · this image</span></div>
+        <ul id="boxList" class="box-list"></ul>
+      </div>
     </aside>
 
     <section class="stage">
       <div id="canvasWrap">
         <canvas id="canvas"></canvas>
-        <p id="emptyHint" class="empty-hint">
-          Load a folder of aerial images to begin.<br>
-          <small>Drag on the image to draw a box around a mine or UXO.
-          Your work autosaves in this browser.</small>
-        </p>
+        <div id="emptyHint" class="empty-hint">
+          <svg class="ic empty-ic"><use href="#i-target"></use></svg>
+          <p class="empty-title">Load a folder of aerial images to begin</p>
+          <p class="empty-sub">Drag on the image to draw a box around a mine or UXO.<br>Your work autosaves in this browser — nothing is uploaded.</p>
+        </div>
       </div>
       <div class="stage-bar">
-        <button class="btn small" id="prevBtn">‹ Prev</button>
+        <button class="icon-btn" id="prevBtn" title="Previous (←)"><svg class="ic"><use href="#i-prev"></use></svg></button>
         <span id="counter" class="counter">—</span>
-        <button class="btn small" id="nextBtn">Next ›</button>
+        <button class="icon-btn" id="nextBtn" title="Next (→)"><svg class="ic"><use href="#i-next"></use></svg></button>
         <span class="spacer"></span>
         <span id="progress" class="progress"></span>
       </div>
     </section>
 
     <aside class="sidebar right">
-      <h2>Filmstrip</h2>
-      <div id="strip" class="strip"></div>
+      <div class="panel grow">
+        <div class="panel-head"><span>Filmstrip</span></div>
+        <div id="strip" class="strip"></div>
+      </div>
     </aside>
   </main>
 
   <footer>
-    100% in your browser — no upload, no server, no account.
-    Built as an open contribution to
+    100% in your browser — no upload, no server, no account. An open contribution to
     <a href="https://www.undp.org/ukraine/press-releases/ai-demining-ukrainian-innovators-train-algorithms-detect-explosives-drone-images">Ukraine's demining-AI effort</a>.
     <a href="https://github.com/sumrtoolz/mine-labeler">Source</a>.
   </footer>

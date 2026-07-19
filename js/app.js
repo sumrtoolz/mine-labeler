@@ -49,7 +49,7 @@
         `<span class="swatch" style="background:${c.color}"></span>` +
         `<span class="name"></span>` +
         `<span class="key">${i < 9 ? i + 1 : ''}</span>` +
-        `<span class="del" title="Remove class">🗑</span>`;
+        `<span class="del" title="Remove class"><svg class="ic"><use href="#i-trash"></use></svg></span>`;
       li.querySelector('.name').textContent = c.name;
       li.addEventListener('click', (e) => {
         if (e.target.classList.contains('del')) return;
@@ -184,7 +184,7 @@
       const cls = state.classes[b.cls];
       li.innerHTML =
         `<span class="swatch" style="background:${cls ? cls.color : '#888'}"></span>` +
-        `<span></span><span class="del">✕</span>`;
+        `<span></span><span class="del" title="Delete box"><svg class="ic"><use href="#i-x"></use></svg></span>`;
       li.children[1].textContent = cls ? cls.name : `#${b.cls}`;
       li.querySelector('.del').addEventListener('click', () => labeler.deleteBox(i));
       ul.appendChild(li);
