@@ -43,6 +43,10 @@ deliberately free, deliberately private.
   ready to drop into an Ultralytics YOLO training run.
 - **Export / import COCO** — a single JSON, so a team can pass partially-labeled
   sets between volunteers.
+- **Georeference + Export GeoJSON** — give an image its real-world bounds (type
+  N/S/E/W, or load an ESRI world file) and every box becomes a true lon/lat
+  polygon. The exported `.geojson` drops straight onto a map — turning "a mine
+  at pixel (412, 380)" into a GPS location a deminer can actually walk to.
 
 ## The formats — worth understanding
 
@@ -63,6 +67,21 @@ A single JSON with `images`, `annotations`, and `categories`. Here `bbox` is
 `[x, y, width, height]` in **absolute pixels** from the top-left corner — a
 different convention from YOLO, which is exactly the kind of detail this tool
 gets right for you. Spec: [cocodataset.org](https://cocodataset.org/#format-data).
+
+### GeoJSON — from pixels to GPS
+A box on its own lives in *pixel* space, which is useless in the field. If the
+image is georeferenced, MineLabeler maps each box corner to WGS84 lon/lat and
+exports a [GeoJSON](https://geojson.org/) `FeatureCollection` of polygons — the
+format every mapping tool (QGIS, Leaflet, geojson.io) reads directly. You supply
+the georeference two ways:
+
+- **Bounds** — north/south latitude and east/west longitude, in decimal degrees.
+- **World file** — the six-line `.tfw`/`.wld` sidecar drone software emits; we
+  parse its affine transform. Projected (UTM-metre) world files are detected and
+  flagged, since GeoJSON requires lon/lat.
+
+Assumes north-up, axis-aligned imagery (true of almost all orthomosaics). The
+math is in `js/geo.js` and is fully unit-tested.
 
 ### Bonus: a dependency-free ZIP writer
 `js/zip.js` builds the YOLO `.zip` from scratch — local file headers, a central
@@ -86,6 +105,7 @@ Run the tests (pure Node, no packages):
 
 ```bash
 node test/exporters.test.js
+node test/geo.test.js
 ```
 
 ## Structure
@@ -95,10 +115,12 @@ index.html            layout
 css/style.css         dark UI
 js/zip.js             dependency-free STORE-method ZIP writer + CRC32
 js/exporters.js       YOLO + COCO conversion (pure, tested)
+js/geo.js             georeferencing: pixel→lon/lat, world files, GeoJSON (pure, tested)
 js/store.js           localStorage autosave (annotations only, never images)
 js/labeler.js         canvas: render image + boxes, draw/edit interactions
-js/app.js             wiring: loading, palette, filmstrip, nav, export
+js/app.js             wiring: loading, palette, filmstrip, nav, geo, export
 test/exporters.test.js  YOLO/COCO/CRC32/ZIP unit tests
+test/geo.test.js        georeferencing + GeoJSON unit tests
 ```
 
 `js/zip.js` and `js/exporters.js` are pure and run under both the browser and

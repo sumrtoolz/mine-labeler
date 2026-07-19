@@ -23,10 +23,18 @@ const Store = (() => {
     }
   }
 
-  // data = { classes: [{name,color}], boxes: { [filename]: [box] } }
+  // data = { classes: [{name,color}], boxes: {[file]: [box]}, geo: {[file]: bounds} }
   function read() {
     const d = load();
-    return { classes: d.classes || null, boxes: d.boxes || {} };
+    return { classes: d.classes || null, boxes: d.boxes || {}, geo: d.geo || {} };
+  }
+
+  function writeGeo(filename, bounds) {
+    const d = load();
+    d.geo = d.geo || {};
+    if (bounds) d.geo[filename] = bounds;
+    else delete d.geo[filename];
+    save(d);
   }
 
   function writeBoxes(filename, boxes) {
@@ -49,5 +57,5 @@ const Store = (() => {
     save(d);
   }
 
-  return { read, writeBoxes, writeClasses, mergeBoxes };
+  return { read, writeBoxes, writeClasses, mergeBoxes, writeGeo };
 })();

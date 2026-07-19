@@ -160,6 +160,37 @@ main { flex: 1; display: flex; min-height: 0; gap: 10px; padding: 10px; }
 .icon-btn.accent:hover { filter: brightness(1.08); }
 .icon-btn .ic { width: 17px; height: 17px; }
 
+/* ---------- Geo-reference ---------- */
+.geo-badge {
+  font-weight: 600; letter-spacing: 0; text-transform: none; font-size: 10px;
+  border-radius: 5px; padding: 1px 7px;
+}
+.geo-badge.off { color: var(--muted-2); border: 1px solid var(--line); }
+.geo-badge.on { color: var(--accent-ink); background: var(--ok); }
+.geo-badge.warn { color: #1a1206; background: var(--accent); }
+
+.geo-body { padding: 10px; display: flex; flex-direction: column; gap: 9px; }
+.geo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.geo-grid label {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--muted); font-weight: 600;
+}
+.geo-grid input {
+  flex: 1; min-width: 0;
+  background: var(--inset); border: 1px solid var(--line);
+  color: var(--text); border-radius: 7px; padding: 6px 7px; font: inherit; font-size: 12px;
+}
+.geo-grid input:focus { outline: none; border-color: var(--accent); }
+.geo-worldfile {
+  display: flex; align-items: center; gap: 7px; cursor: pointer;
+  padding: 7px 9px; border-radius: 8px;
+  border: 1px dashed var(--line); color: var(--muted); font-size: 12px;
+  transition: border-color .1s, color .1s;
+}
+.geo-worldfile:hover { border-color: var(--muted-2); color: var(--text); }
+.geo-worldfile .ic { width: 16px; height: 16px; flex: none; }
+.geo-hint { font-size: 10.5px; color: var(--muted-2); line-height: 1.5; }
+
 /* ---------- Box list ---------- */
 .box-list { list-style: none; padding: 8px; display: flex; flex-direction: column; gap: 3px; overflow-y: auto; }
 .box-row {

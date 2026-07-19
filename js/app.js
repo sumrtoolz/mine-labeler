@@ -16,6 +16,7 @@
     idx: -1,
     classes: [],
     activeClass: 0,
+    geo: {}, // filename -> { n, s, e, w } bounds in WGS84 degrees
   };
 
   const $ = (id) => document.getElementById(id);
@@ -23,6 +24,7 @@
 
   const persisted = Store.read();
   state.classes = persisted.classes || DEFAULT_CLASSES.map((c) => ({ ...c }));
+  state.geo = persisted.geo || {};
 
   const labeler = new Labeler(canvas, {
     onChange: (boxes) => {
@@ -168,7 +170,74 @@
     const active = $('strip').children[i];
     if (active) active.scrollIntoView({ block: 'nearest' });
     renderBoxList();
+    loadGeoFields();
   }
+
+  // ---- Geo-reference ----
+  function loadGeoFields() {
+    const im = state.images[state.idx];
+    const b = im ? state.geo[im.name] : null;
+    $('geoN').value = b ? b.n : '';
+    $('geoS').value = b ? b.s : '';
+    $('geoW').value = b ? b.w : '';
+    $('geoE').value = b ? b.e : '';
+    updateGeoStatus();
+  }
+
+  function updateGeoStatus() {
+    const badge = $('geoStatus');
+    const im = state.images[state.idx];
+    const b = im ? state.geo[im.name] : null;
+    if (Geo.isValidBounds(b)) { badge.textContent = 'georeferenced'; badge.className = 'geo-badge on'; }
+    else if (b) { badge.textContent = 'invalid bounds'; badge.className = 'geo-badge warn'; }
+    else { badge.textContent = 'not set'; badge.className = 'geo-badge off'; }
+  }
+
+  function readGeoFields() {
+    const im = state.images[state.idx];
+    if (!im) return;
+    const num = (id) => { const v = parseFloat($(id).value); return isFinite(v) ? v : null; };
+    const n = num('geoN'), s = num('geoS'), w = num('geoW'), e = num('geoE');
+    if (n === null && s === null && w === null && e === null) {
+      delete state.geo[im.name];
+      Store.writeGeo(im.name, null);
+    } else {
+      const b = { n, s, e, w };
+      state.geo[im.name] = b;
+      Store.writeGeo(im.name, b);
+    }
+    updateGeoStatus();
+  }
+
+  ['geoN', 'geoS', 'geoW', 'geoE'].forEach((id) => $(id).addEventListener('input', readGeoFields));
+
+  $('worldInput').addEventListener('change', (e) => {
+    const im = state.images[state.idx];
+    if (!im) { alert('Load an image first, then attach its world file.'); e.target.value = ''; return; }
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const wf = Geo.parseWorldFile(reader.result);
+        const b = Geo.worldFileToBounds(wf, im.width, im.height);
+        if (b.projected) {
+          alert('This world file uses projected coordinates (e.g. UTM metres), not lon/lat degrees. GeoJSON needs WGS84 — reproject the imagery to EPSG:4326 first, or enter lon/lat bounds manually.');
+          return;
+        }
+        if (b.rotated) alert('Note: this world file includes rotation, which north-up bounds can\'t fully represent. Corners may be slightly off.');
+        const bounds = { n: b.n, s: b.s, e: b.e, w: b.w };
+        state.geo[im.name] = bounds;
+        Store.writeGeo(im.name, bounds);
+        loadGeoFields();
+      } catch (err) {
+        alert('Could not read world file: ' + err.message);
+      } finally {
+        e.target.value = '';
+      }
+    };
+    reader.readAsText(file);
+  });
 
   $('prevBtn').addEventListener('click', () => showImage(state.idx - 1));
   $('nextBtn').addEventListener('click', () => showImage(state.idx + 1));
@@ -242,6 +311,17 @@
     if (!d.images.some((im) => im.boxes.length)) return alert('No boxes to export yet.');
     const json = JSON.stringify(Exporters.coco(d.images, d.classes), null, 2);
     download(new Blob([json], { type: 'application/json' }), 'minelabeler_coco.json');
+  });
+
+  $('exportGeojson').addEventListener('click', () => {
+    const d = dataset();
+    const geoImages = d.images.filter((im) => state.geo[im.name] && Geo.isValidBounds(state.geo[im.name]));
+    if (!geoImages.length) {
+      return alert('No georeferenced images yet. Set N/S/E/W bounds (or load a world file) for at least one image with boxes.');
+    }
+    const fc = Geo.toGeoJSON(d.images, d.classes, state.geo);
+    if (!fc.features.length) return alert('Georeferenced images have no boxes to export.');
+    download(new Blob([JSON.stringify(fc, null, 2)], { type: 'application/geo+json' }), 'minelabeler_detections.geojson');
   });
 
   $('importInput').addEventListener('change', (e) => {
