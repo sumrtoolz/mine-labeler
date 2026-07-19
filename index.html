@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MineLabeler — annotate aerial imagery for humanitarian demining AI</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <h1>🛰️ MineLabeler</h1>
+      <span class="tag">open training-data labeling for humanitarian demining</span>
+    </div>
+    <div class="header-actions">
+      <label class="btn file-btn">
+        Load images
+        <input type="file" id="fileInput" accept="image/*" multiple hidden>
+      </label>
+      <label class="btn ghost file-btn">
+        Import COCO
+        <input type="file" id="importInput" accept="application/json,.json" hidden>
+      </label>
+      <button class="btn ghost" id="exportYolo">Export YOLO</button>
+      <button class="btn ghost" id="exportCoco">Export COCO</button>
+    </div>
+  </header>
+
+  <main>
+    <aside class="sidebar left">
+      <h2>Classes <span class="hint">(hotkeys 1–9)</span></h2>
+      <ul id="classList"></ul>
+      <div class="add-class">
+        <input type="text" id="newClassName" placeholder="Add class…" maxlength="32">
+        <button class="btn small" id="addClassBtn">+</button>
+      </div>
+
+      <h2>Boxes on this image</h2>
+      <ul id="boxList" class="box-list"></ul>
+    </aside>
+
+    <section class="stage">
+      <div id="canvasWrap">
+        <canvas id="canvas"></canvas>
+        <p id="emptyHint" class="empty-hint">
+          Load a folder of aerial images to begin.<br>
+          <small>Drag on the image to draw a box around a mine or UXO.
+          Your work autosaves in this browser.</small>
+        </p>
+      </div>
+      <div class="stage-bar">
+        <button class="btn small" id="prevBtn">‹ Prev</button>
+        <span id="counter" class="counter">—</span>
+        <button class="btn small" id="nextBtn">Next ›</button>
+        <span class="spacer"></span>
+        <span id="progress" class="progress"></span>
+      </div>
+    </section>
+
+    <aside class="sidebar right">
+      <h2>Filmstrip</h2>
+      <div id="strip" class="strip"></div>
+    </aside>
+  </main>
+
+  <footer>
+    100% in your browser — no upload, no server, no account.
+    Built as an open contribution to
+    <a href="https://www.undp.org/ukraine/press-releases/ai-demining-ukrainian-innovators-train-algorithms-detect-explosives-drone-images">Ukraine's demining-AI effort</a>.
+    <a href="https://github.com/sumrtoolz/mine-labeler">Source</a>.
+  </footer>
+
+  <script src="js/zip.js"></script>
+  <script src="js/exporters.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/labeler.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
